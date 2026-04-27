@@ -1,0 +1,61 @@
+import pandas as pd
+import numpy as np
+
+# 1. Ваші нові категорії (не техніка)
+categories = [
+    (101, "Organic Food & Beverages"),
+    (102, "Home Fitness Equipment"),
+    (103, "Pet Care & Accessories"),
+    (104, "Garden & Outdoor Tools"),
+    (105, "Baby & Toddler Products"),
+    (106, "Beauty & Personal Care"),
+    (107, "Board Games & Hobbies"),
+    (108, "Eco-Friendly Stationery"),
+    (109, "Musical Instruments"),
+    (110, "Handmade Home Decor")
+]
+
+# 2. Налаштування дат (35 місяців для 10 категорій = 350 рядків)
+dates = pd.date_range(start="2024-01-01", periods=35, freq="MS")
+
+data = []
+
+# 3. Генерація цифр
+for cat_id, cat_name in categories:
+    # Базовий оборот для категорії (від 1 до 5 млрд)
+    base_market = np.random.uniform(1_000_000_000, 5_000_000_000)
+    
+    # Частка Amazon для цієї категорії (від 8% до 25%)
+    amazon_share_base = np.random.uniform(0.08, 0.25)
+    
+    for date in dates:
+        month = date.month
+        
+        # Моделювання сезонності (піки взимку та влітку)
+        seasonality = 1.0 + 0.3 * np.sin(2 * np.pi * month / 12)
+        
+        # Додаємо трохи випадковості (noise)
+        noise_market = np.random.uniform(0.9, 1.1)
+        noise_amazon = np.random.uniform(0.95, 1.05)
+        
+        # Розрахунок значень
+        market_rev = base_market * seasonality * noise_market
+        amazon_rev = market_rev * amazon_share_base * noise_amazon
+        
+        data.append({
+            "month": date.strftime("%Y-%m-%d"),
+            "product_group_id": cat_id,
+            "product_group_name": cat_name,
+            "market_revenue": round(market_rev, 1),
+            "revenue_amazon": round(amazon_rev, 1)
+        })
+
+# 4. Створення та збереження CSV
+df = pd.DataFrame(data)
+df.to_csv("market_data_custom.csv", index=False)
+
+# Вивід результату для перевірки
+print("Файл 'market_data_custom.csv' успішно створено.")
+print(f"Загальна кількість рядків: {len(df)}")
+print("\nПерші 5 рядків:")
+print(df.head())
