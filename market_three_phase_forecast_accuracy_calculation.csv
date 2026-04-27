@@ -1,42 +1,36 @@
 import pandas as pd
 
-# 1. Завантаження даних
+# завантаження файлу
 df = pd.read_csv("forecast_of_market_dataset.csv")
 
-# 2. Перетворення дати
+# перетворюємо дату
 df["month"] = pd.to_datetime(df["month"])
 
-# 3. Сортування
-df = df.sort_values(by=["product_group_id", "month"])
+# сортуємо
+df = df.sort_values(["product_group_id", "month"])
 
-# 4. Розрахунок частки Amazon
-df["amazon_share"] = df["revenue_amazon"] / df["market_revenue"]
+# створюємо прогноз (як у типовому прикладі — середнє за 3 місяці)
+df["forecast"] = df.groupby("product_group_id")["market_revenue"]\
+                   .rolling(3).mean().reset_index(0, drop=True)
 
-# 5. Додаємо рік і місяць
-df["year"] = df["month"].dt.year
-df["month_num"] = df["month"].dt.month
+# рахуємо помилку
+df["error"] = df["market_revenue"] - df["forecast"]
 
-# 6. Простий forecast (наприклад: середнє за попередні 3 місяці)
-df["forecast_market"] = (
-    df.groupby("product_group_id")["market_revenue"]
-    .rolling(window=3)
-    .mean()
-    .reset_index(0, drop=True)
-)
+# абсолютна помилка
+df["abs_error"] = df["error"].abs()
 
-# 7. Помилка прогнозу
-df["forecast_error"] = df["market_revenue"] - df["forecast_market"]
+# MAPE
+df["mape"] = df["abs_error"] / df["market_revenue"] * 100
 
-# 8. Абсолютна помилка
-df["abs_error"] = df["forecast_error"].abs()
+# фінальна таблиця (як зазвичай у прикладах)
+final_table = df.groupby("product_group_name")[["market_revenue", "forecast", "mape"]]\
+                .mean().reset_index()
 
-# 9. MAPE (у %)
-df["mape"] = (df["abs_error"] / df["market_revenue"]) * 100
+# округлення для красивого вигляду
+final_table = final_table.round(2)
 
-# 10. Результат по категоріях
-result = df.groupby("product_group_name")["mape"].mean().reset_index()
+# вивід
+print(final_table)
 
-# 11. Збереження
-result.to_csv("forecast_accuracy_results.csv", index=False)
-
-print(result)
+# збереження
+final_table.to_csv("final_forecast_table.csv", index=False)
