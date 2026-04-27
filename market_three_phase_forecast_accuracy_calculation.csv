@@ -1,4 +1,4 @@
-raw_data = """month,product_group_id,product_group_name,market_revenue,revenue_amazon
+month,product_group_id,product_group_name,market_revenue,revenue_amazon
 2024-01-01,301,Art Supplies & Stationery,420500000.0,185400000.0
 2024-02-01,301,Art Supplies & Stationery,390200000.0,165800000.0
 2024-03-01,301,Art Supplies & Stationery,415600000.0,172300000.0
