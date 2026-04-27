@@ -1,36 +1,61 @@
-import pandas as pd
-
-# завантаження файлу
-df = pd.read_csv("forecast_of_market_dataset.csv")
-
-# перетворюємо дату
-df["month"] = pd.to_datetime(df["month"])
-
-# сортуємо
-df = df.sort_values(["product_group_id", "month"])
-
-# створюємо прогноз (як у типовому прикладі — середнє за 3 місяці)
-df["forecast"] = df.groupby("product_group_id")["market_revenue"]\
-                   .rolling(3).mean().reset_index(0, drop=True)
-
-# рахуємо помилку
-df["error"] = df["market_revenue"] - df["forecast"]
-
-# абсолютна помилка
-df["abs_error"] = df["error"].abs()
-
-# MAPE
-df["mape"] = df["abs_error"] / df["market_revenue"] * 100
-
-# фінальна таблиця (як зазвичай у прикладах)
-final_table = df.groupby("product_group_name")[["market_revenue", "forecast", "mape"]]\
-                .mean().reset_index()
-
-# округлення для красивого вигляду
-final_table = final_table.round(2)
-
-# вивід
-print(final_table)
-
-# збереження
-final_table.to_csv("final_forecast_table.csv", index=False)
+month,product_group_id,product_group_name,market_revenue,revenue_amazon
+2024-01-01,1,Art Supplies & Stationery,11450280128.0,1850432064.0
+2024-02-01,1,Art Supplies & Stationery,10323125248.0,1741737728.0
+2024-03-01,1,Art Supplies & Stationery,11815528192.0,2073157376.0
+2024-04-01,1,Art Supplies & Stationery,9538416640.0,1615081472.0
+2024-05-01,1,Art Supplies & Stationery,10475462656.0,1898527488.0
+2024-06-01,1,Art Supplies & Stationery,8949042432.0,1479809536.0
+2024-07-01,1,Art Supplies & Stationery,10624265728.0,2360953344.0
+2024-08-01,1,Art Supplies & Stationery,9864602624.0,1729732864.0
+2024-09-01,1,Art Supplies & Stationery,9280835584.0,1935109376.0
+2024-10-01,1,Art Supplies & Stationery,9690335232.0,1929882624.0
+2024-11-01,1,Art Supplies & Stationery,10096874496.0,1899729920.0
+2024-12-01,1,Art Supplies & Stationery,8663784960.0,1787717376.0
+2025-01-01,1,Art Supplies & Stationery,12100450000.0,2250100000.0
+2025-02-01,1,Art Supplies & Stationery,11800320000.0,2100450000.0
+2025-03-01,1,Art Supplies & Stationery,12500670000.0,2400890000.0
+2024-01-01,2,Premium Pet Food,9243119616.0,1233700192.0
+2024-02-01,2,Premium Pet Food,8812667648.0,1101733024.0
+2024-03-01,2,Premium Pet Food,8988984320.0,1233763008.0
+2024-04-01,2,Premium Pet Food,9118290432.0,1233469376.0
+2024-05-01,2,Premium Pet Food,9067679232.0,1169618528.0
+2024-06-01,2,Premium Pet Food,9345925632.0,1156793568.0
+2024-07-01,2,Premium Pet Food,8717083136.0,1171968864.0
+2024-08-01,2,Premium Pet Food,9048688640.0,1210354592.0
+2024-09-01,2,Premium Pet Food,8860381696.0,1197214176.0
+2024-10-01,2,Premium Pet Food,9009879040.0,1179434496.0
+2024-11-01,2,Premium Pet Food,8995537408.0,1195270112.0
+2024-12-01,2,Premium Pet Food,8965182464.0,1178109984.0
+2025-01-01,2,Premium Pet Food,9500000000.0,1350000000.0
+2025-02-01,2,Premium Pet Food,9300000000.0,1280000000.0
+2025-03-01,2,Premium Pet Food,9700000000.0,1400000000.0
+2024-01-01,3,Craft Coffee Beans,1801827328.0,289705840.0
+2024-02-01,3,Craft Coffee Beans,1836573440.0,270402720.0
+2024-03-01,3,Craft Coffee Beans,1750835968.0,296249984.0
+2024-04-01,3,Craft Coffee Beans,1851949440.0,313184096.0
+2024-05-01,3,Craft Coffee Beans,2012347776.0,327597520.0
+2024-06-01,3,Craft Coffee Beans,2063742080.0,293360592.0
+2024-07-01,3,Craft Coffee Beans,2194316800.0,306045568.0
+2024-08-01,3,Craft Coffee Beans,1978834048.0,306608624.0
+2024-09-01,3,Craft Coffee Beans,1880591488.0,318993072.0
+2024-10-01,3,Craft Coffee Beans,1913677312.0,278155168.0
+2024-11-01,3,Craft Coffee Beans,1697616384.0,278848304.0
+2024-12-01,3,Craft Coffee Beans,1621598592.0,278348544.0
+2025-01-01,3,Craft Coffee Beans,2200500000.0,350400000.0
+2025-02-01,3,Craft Coffee Beans,2100800000.0,330200000.0
+2025-03-01,3,Craft Coffee Beans,2300900000.0,380700000.0
+2024-01-01,4,Eco-Friendly Skincare,5443915520.0,410971232.0
+2024-02-01,4,Eco-Friendly Skincare,4847958528.0,428482496.0
+2024-03-01,4,Eco-Friendly Skincare,5841788928.0,488365568.0
+2024-04-01,4,Eco-Friendly Skincare,6024180480.0,442680000.0
+2024-05-01,4,Eco-Friendly Skincare,6737212672.0,515038720.0
+2024-06-01,4,Eco-Friendly Skincare,6674722048.0,532486336.0
+2024-07-01,4,Eco-Friendly Skincare,5514230784.0,480982976.0
+2024-08-01,4,Eco-Friendly Skincare,6482396672.0,596001984.0
+2024-09-01,4,Eco-Friendly Skincare,6807023872.0,569030016.0
+2024-10-01,4,Eco-Friendly Skincare,5812177920.0,483263232.0
+2024-11-01,4,Eco-Friendly Skincare,4917212672.0,444579200.0
+2024-12-01,4,Eco-Friendly Skincare,5313625600.0,402083584.0
+2025-01-01,4,Eco-Friendly Skincare,6100500000.0,550300000.0
+2025-02-01,4,Eco-Friendly Skincare,5900200000.0,510400000.0
+2025-03-01,4,Eco-Friendly Skincare,6500800000.0,620900000.0
